@@ -16,7 +16,7 @@
 	extern "C" {
 #endif
 
-#include <nimcenum.h>
+#include "nimcenum.h"
 
 //Notes: Structure order changed in NI-Motion 8.0
 #pragma pack(push, 1)

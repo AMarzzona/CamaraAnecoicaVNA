@@ -18,7 +18,7 @@
 /*-----------------------------------------------------------------------------
    Error Defines
 -----------------------------------------------------------------------------*/
-#include <MotnErr.h>       //Error Codes
+#include "MotnErr.h"       //Error Codes
 #include <stdbool.h>
 
 /*-----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ typedef u32 TnimcReadData;
 typedef u32 TnimcWriteData;
 typedef u32 TnimcReadStatus;
 
-#include <nimcenum.h>      //NI-Motion Attribute Enumerations
+#include "nimcenum.h"      //NI-Motion Attribute Enumerations
 
 #endif // __nimcMotionTypes__
 
@@ -113,7 +113,7 @@ typedef u32 TnimcReadStatus;
 -----------------------------------------------------------------------------*/
 #ifdef __nimcStructs__
 
-#include <nimcstruct.h>   //NI-Motion Structures
+#include "nimcstruct.h"   //NI-Motion Structures
 
 #endif // __nimcStructs__
 
