@@ -1,5 +1,4 @@
-from drivers.motor import TxMotor, TxMotorError
-
+from drivers.tx_motor import TxMotor, TxMotorError
 
 def main():
     try:
