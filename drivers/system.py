@@ -57,7 +57,7 @@ class SYS:
 
         # Diretório local para armazenamento dos dados
         # Observação: caminho relativo ao diretório de execução
-        self.cache_dir = Path("../.cache")
+        self.cache_dir = Path("../.cache/sys")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _step_angle(self) -> float:
