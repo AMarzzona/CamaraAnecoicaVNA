@@ -8,9 +8,8 @@ from time import sleep
 import numpy as np
 
 from vna import VNA
-from motor import MTR
 from ..config import CFG
-
+from tx import rotate_tx
 
 class SYS:
     """
@@ -23,7 +22,7 @@ class SYS:
     - Persistência dos dados em disco (.npz)
 
     Convenções assumidas:
-    - self.mtr.rotate_tx(angle_deg): rotação absoluta da antena transmissora (Tx)
+    - self.rotate_tx(angle_deg): rotação absoluta da antena transmissora (Tx)
     - self.mtr.rotate_rx(angle_deg): rotação absoluta da antena receptora (Rx)
     - Sistema angular em graus [0, 360)
 
@@ -55,9 +54,6 @@ class SYS:
 
         # Configuração do sweep de frequência
         self.vna.configure_sweep(fstart=CFG.FSTART, fstop=CFG.FSTOP, points=CFG.POINTS)
-
-        # Inicialização do sistema de motores
-        self.mtr = MTR(CFG.MTR_ADDRESS)
 
         # Diretório local para armazenamento dos dados
         # Observação: caminho relativo ao diretório de execução
@@ -158,7 +154,7 @@ class SYS:
         Dependência:
             - Implementação interna do driver MTR
         """
-        self.mtr.rotate_tx(0.0)
+        self.rotate_tx(0.0)
 
     def _set_tx_horizontal(self) -> None:
         """
@@ -167,7 +163,7 @@ class SYS:
         Convenção adotada:
             90° → horizontal
         """
-        self.mtr.rotate_tx(90.0)
+        self.rotate_tx(90.0)
 
     def _measure_full_rotation(self, tx_pol: str) -> dict[str, np.ndarray]:
         """

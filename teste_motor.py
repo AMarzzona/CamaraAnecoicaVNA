@@ -1,37 +1,21 @@
-from drivers.tx_motor import TxMotor, TxMotorError
+from drivers.tx import rotate_tx
+import time
 
 def main():
-    try:
-        with TxMotor() as tx:
-            print("Abrindo sistema...")
-            tx.open(1)
+    print("=== TESTE MOTOR TX ===")
 
-            print("Inicializando TX...")
-            tx.initialize()
+    rotate_tx(0)
+    time.sleep(1)
 
-            print("Definindo posição atual como 0°...")
-            tx.set_zero()
+    rotate_tx(90)
+    time.sleep(1)
 
-            print("Indo para horizontal (90°)...")
-            tx.go_horizontal()
-            print(f"Posição atual: {tx.get_position():.3f} deg")
+    rotate_tx(90)  # não deve mover
 
-            print("Indo para vertical (0°)...")
-            tx.go_vertical()
-            print(f"Posição atual: {tx.get_position():.3f} deg")
+    rotate_tx(0)
+    time.sleep(1)
 
-            print("Desligando eixo...")
-            tx.shutdown()
-
-            print("Teste concluído.")
-
-    except TxMotorError as e:
-        print("ERRO DO MOTOR:")
-        print(e)
-
-    except Exception as e:
-        print("ERRO GERAL:")
-        print(e)
+    print("=== FIM ===")
 
 
 if __name__ == "__main__":
