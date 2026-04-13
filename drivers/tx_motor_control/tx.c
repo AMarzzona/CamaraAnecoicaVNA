@@ -7,9 +7,9 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
-        printf("Uso: tx.exe <targetPosition>\n");
+        printf("Uso: tx.exe <targetPosition> <outputPath>\n");
         return -1;
     }
 
@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     f64 velocity = 500;
 
     i32 targetPosition = atoi(argv[1]);
+    const char *outputPath = argv[2];
 
     u16 axisStatus;
     u16 csr = 0;
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
     // =========================
     // SALVAR EM ARQUIVO
     // =========================
-    FILE *f = fopen("../.cache/tx/finalPosition.txt", "w");
+    FILE *f = fopen(outputPath, "w");
     if (f != NULL)
     {
         fprintf(f, "%d", position);
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("Erro ao escrever arquivo de cache.\n");
+        perror("Erro ao escrever arquivo de cache");
     }
 
     return 0;

@@ -4,9 +4,14 @@ import time
 
 BASE_DIR = os.path.dirname(__file__)
 
-EXECUTABLE = os.path.join(BASE_DIR, "tx_motor_control", "tx.exe")
+CONTROL_DIR = os.path.join(BASE_DIR, "tx_motor_control")
+EXECUTABLE = os.path.join(CONTROL_DIR, "tx.exe")
 
-CACHE_FILE = os.path.join(BASE_DIR, "..", ".cache", "tx", "finalPosition.txt")
+# Caminho ABSOLUTO (fundamental agora)
+CACHE_FILE = os.path.abspath(
+    os.path.join(BASE_DIR, "..", ".cache", "tx", "finalPosition.txt")
+)
+
 os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
 
 # =========================
@@ -31,7 +36,7 @@ def _read_position():
     try:
         with open(CACHE_FILE, "r") as f:
             return int(f.read().strip())
-    except:
+    except Exception:
         return None
 
 
@@ -48,12 +53,16 @@ def rotate_tx(target_deg: float):
 
         print(f"[TX] Posição atual (steps): {current_steps}")
 
-        # Convergência
+        # =========================
+        # CONVERGÊNCIA
+        # =========================
         if current_steps == target_steps:
             print("[TX] Posição atingida.")
             return
 
-        # Proteção contra loop infinito
+        # =========================
+        # PROTEÇÃO
+        # =========================
         if attempt >= MAX_ATTEMPTS:
             raise RuntimeError(
                 f"[TX] Falha de convergência após {MAX_ATTEMPTS} tentativas. "
@@ -63,8 +72,15 @@ def rotate_tx(target_deg: float):
         attempt += 1
         print(f"[TX] Tentativa #{attempt} — movendo motor...")
 
+        # =========================
+        # CHAMADA DO EXECUTÁVEL
+        # =========================
         result = subprocess.run(
-            [EXECUTABLE, str(target_steps)],
+            [
+                EXECUTABLE,
+                str(target_steps),
+                CACHE_FILE
+            ],
             cwd=CONTROL_DIR
         )
 
