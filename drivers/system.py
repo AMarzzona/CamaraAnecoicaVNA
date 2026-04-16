@@ -8,7 +8,7 @@ from time import time
 import numpy as np
 import pyvisa
 
-from vna import VNA
+from drivers.vna import VNA
 from config import CFG
 from drivers.tx import rotate_tx
 
@@ -234,7 +234,7 @@ class SYS:
         last_angle = None
         last_change_time = time()
 
-        while len(angle) < 720:
+        while len(angles) < 720:
             angle = self._read_angle(encoder)
 
             if self._should_sample(angle, last_angle):
@@ -264,51 +264,51 @@ class SYS:
             "S22": s22_list,
         }
 
-def _finalize_data(self, raw: dict) -> dict[str, np.ndarray]:
-    """
-    Consolida e valida os dados adquiridos.
+    def _finalize_data(self, raw: dict) -> dict[str, np.ndarray]:
+        """
+        Consolida e valida os dados adquiridos.
 
-    Etapas:
-    - Conversão para arrays NumPy
-    - Validação dimensional
-    - Verificação de limite de amostras
-    - Ordenação por ângulo
+        Etapas:
+        - Conversão para arrays NumPy
+        - Validação dimensional
+        - Verificação de limite de amostras
+        - Ordenação por ângulo
 
-    Garantias:
-    - Consistência entre vetores
-    - Ordenação crescente de ângulo
-    - Limite máximo de 720 pontos
+        Garantias:
+        - Consistência entre vetores
+        - Ordenação crescente de ângulo
+        - Limite máximo de 720 pontos
 
-    Retorno:
-    - dict com arrays ordenados
-    """
-    angle = np.asarray(raw["angle"])
-    freq = np.asarray(raw["freq"])
+        Retorno:
+        - dict com arrays ordenados
+        """
+        angle = np.asarray(raw["angle"])
+        freq = np.asarray(raw["freq"])
 
-    S11 = np.asarray(raw["S11"])
-    S21 = np.asarray(raw["S21"])
-    S12 = np.asarray(raw["S12"])
-    S22 = np.asarray(raw["S22"])
+        S11 = np.asarray(raw["S11"])
+        S21 = np.asarray(raw["S21"])
+        S12 = np.asarray(raw["S12"])
+        S22 = np.asarray(raw["S22"])
 
-    # -------------------------
-    # Ordenação por ângulo
-    # -------------------------
-    idx = np.argsort(angle)
+        # -------------------------
+        # Ordenação por ângulo
+        # -------------------------
+        idx = np.argsort(angle)
 
-    angle_sorted = angle[idx]
-    S11_sorted = S11[idx]
-    S21_sorted = S21[idx]
-    S12_sorted = S12[idx]
-    S22_sorted = S22[idx]
+        angle_sorted = angle[idx]
+        S11_sorted = S11[idx]
+        S21_sorted = S21[idx]
+        S12_sorted = S12[idx]
+        S22_sorted = S22[idx]
 
-    return {
-        "angle": angle_sorted,
-        "freq": freq,
-        "S11": S11_sorted,
-        "S21": S21_sorted,
-        "S12": S12_sorted,
-        "S22": S22_sorted,
-    }
+        return {
+            "angle": angle_sorted,
+            "freq": freq,
+            "S11": S11_sorted,
+            "S21": S21_sorted,
+            "S12": S12_sorted,
+            "S22": S22_sorted,
+        }
 
     def _measure_full_rotation(self, tx_pol: str) -> dict[str, np.ndarray]:
         """
