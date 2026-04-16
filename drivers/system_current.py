@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from datetime import datetime
 from uuid import uuid4
-from time import sleep
+from time import time
 
 import numpy as np
+import pyvisa
 
 from vna import VNA
 from ..config import CFG
@@ -55,51 +56,12 @@ class SYS:
         # Configuração do sweep de frequência
         self.vna.configure_sweep(fstart=CFG.FSTART, fstop=CFG.FSTOP, points=CFG.POINTS)
 
+        self.WATCHDOG_TIMEOUT = 5.0  # segundos sem mudança tolerada
+
         # Diretório local para armazenamento dos dados
         # Observação: caminho relativo ao diretório de execução
         self.cache_dir = Path("../.cache/sys")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-
-    def _step_angle(self) -> float:
-        """
-        Calcula o passo angular da varredura.
-
-        Definição:
-            step = BEAM_WIDTH / 10
-
-        Interpretação física:
-        - Amostragem angular equivalente a 10 pontos por largura de feixe
-        - Garante resolução suficiente para reconstrução do diagrama de radiação
-
-        Retorna:
-            float: passo angular em graus
-
-        Erro:
-            - Lança exceção se BEAM_WIDTH <= 0
-        """
-        step = float(CFG.BEAM_WIDTH) / 10.0
-
-        if step <= 0:
-            raise ValueError("CFG.BEAM_WIDTH deve ser positivo.")
-
-        return step
-
-    def _angles(self) -> np.ndarray:
-        """
-        Gera vetor de ângulos para a varredura completa.
-
-        Intervalo:
-            [0, 360) com passo definido por _step_angle()
-
-        Retorna:
-            np.ndarray: vetor 1D de ângulos (graus)
-
-        Observação:
-            - 360 não é incluído (evita redundância com 0°)
-            - Distribuição uniforme
-        """
-        step = self._step_angle()
-        return np.arange(0.0, 360.0, step, dtype=float)
 
     def _make_run_id(self) -> str:
         """
@@ -154,7 +116,7 @@ class SYS:
         Dependência:
             - Implementação interna do driver MTR
         """
-        self.rotate_tx(0.0)
+        rotate_tx(0.0)
 
     def _set_tx_horizontal(self) -> None:
         """
@@ -163,7 +125,7 @@ class SYS:
         Convenção adotada:
             90° → horizontal
         """
-        self.rotate_tx(90.0)
+        rotate_tx(90.0)
 
     def _measure_full_rotation(self, tx_pol: str) -> dict[str, np.ndarray]:
         """
@@ -194,17 +156,19 @@ class SYS:
             - Não há verificação de erro de posicionamento
             - freq é assumido constante ao longo da varredura
         """
-        angles = self._angles()
 
         # Seleção da polarização da Tx
         if tx_pol == "V":
             self._set_tx_vertical()
+            print("Antena transmissora posicionada na polarização vertical (V).")
         elif tx_pol == "H":
             self._set_tx_horizontal()
+            print("Antena transmissora posicionada na polarização horizontal (H).")
         else:
             raise ValueError("tx_pol deve ser 'V' ou 'H'.")
 
         freq = None
+        angles = []
 
         # Listas temporárias (posteriormente convertidas para arrays)
         s11_list = []
@@ -212,30 +176,59 @@ class SYS:
         s12_list = []
         s22_list = []
 
-        for angle in angles:
-            # Movimento da antena receptora (posição absoluta)
-            self.mtr.rotate_rx(float(angle))
+        rm = pyvisa.ResourceManager()
 
-            # Tempo de acomodação mecânica
-            # IMPORTANTE:
-            # - valor empírico
-            # - deve ser ajustado conforme inércia/carga do sistema
-            sleep(0.001)
+        # Enconder
+        encoder = rm.open_resource("TCPIP0::192.168.10.10::gpib1,8::INSTR")
+        encoder.clear()
 
-            # Aquisição dos parâmetros S
-            data = self.vna.measure_all_s()
+        # Power supply
+        pwr = rm.open_resource("TCPIP0::192.168.10.10::gpib1,6::INSTR")
+        pwr.clear()
+        try:
+            pwr.write("VOLT 30")
+            pwr.write("CURR 1")
+            pwr.write("OUTP ON")
 
-            # Captura vetor de frequência apenas na primeira iteração
-            if freq is None:
-                freq = np.asarray(data["freq"])
+            measure = 0
+            curr_angle = None
+            last_change_time = time()
 
-            # Armazenamento incremental
-            s11_list.append(np.asarray(data["S11"]))
-            s21_list.append(np.asarray(data["S21"]))
-            s12_list.append(np.asarray(data["S12"]))
-            s22_list.append(np.asarray(data["S22"]))
+            while (measure < 720):
+                angle = self._discretize_angle(self._parse_angle(encoder.query("MEAS?")))
 
-        # Conversão para arrays numpy estruturados
+                if curr_angle is None or int(10*angle) != int(10*curr_angle):
+                    angles[measure] = angle
+                    measure += 1
+                    curr_angle = angle
+                    last_change_time = time()
+                    
+                    data = self.vna.measure_all_s()
+
+                    if freq is None:
+                        freq = np.asarray(data["freq"])
+
+                    s11_list.append(np.asarray(data["S11"]))
+                    s21_list.append(np.asarray(data["S21"]))
+                    s12_list.append(np.asarray(data["S12"]))
+                    s22_list.append(np.asarray(data["S22"]))
+                
+                if time() - last_change_time > self.WATCHDOG_TIMEOUT:
+                    raise RuntimeError("Watchdog: ângulo não evolui (possível travamento do encoder ou motor).")
+
+        except KeyboardInterrupt:
+            print("Interrompido pelo usuário (Ctrl+C).")
+
+        except Exception as e:
+            print(f"Erro crítico: {e}")
+
+        else:
+            print("Medida finalizada.")
+
+        finally:
+            print("Desligando fonte...")
+            pwr.write("OUTP OFF")
+
         result = {
             "angle": np.asarray(angles),
             "freq": np.asarray(freq),
@@ -328,3 +321,34 @@ class SYS:
             "v": file_v,
             "h": file_h,
         }
+    
+    def _parse_angle(self, raw: str) -> float:
+        raw = raw.strip()
+        digits = raw[1:]
+
+        integer_part = int(digits[:3])
+        fractional_part = int(digits[3:]) / 1000
+
+        angle = integer_part + fractional_part
+
+        return round(angle, 1)
+
+    def _discretize_angle(self, num: float) -> float:
+        integer_part = int(num)
+        fractional_part = int(10*num)-10*integer_part
+
+        def parse_fractional_part(dec: int) -> float:
+            if (dec <=2): 
+                return 0.0
+            elif (3 <= dec <= 6):
+                return 0.5
+            elif  (7 <= dec):
+                return 1.0
+            else:
+                 raise ValueError("Parte fracionária da leitura do encoder fora do intervalo permtido.")
+
+    out = integer_part + parse_fractional_part(fractional_part)
+    if (int(out) == 360):
+        out = 0.0
+
+    return out
