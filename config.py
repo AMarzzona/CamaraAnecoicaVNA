@@ -38,17 +38,8 @@ class Config(NamedTuple):
         - Erros aqui resultam em falha de conexão na inicialização
     """
 
-    MTR_ADDRESS: str
-    """
-    Endereço do controlador de motores.
-
-    Observações:
-        - Depende da implementação da classe MTR
-        - Pode ser:
-            * Porta serial (ex: "COM3", "/dev/ttyUSB0")
-            * Endereço IP (caso controle via rede)
-        - Atualmente vazio → requer preenchimento para operação real
-    """
+    RX_ENCODER_ADDRESS: str
+    RX_POWERSUPPLY_ADDRESS: str
 
     # -------------------------
     # Parâmetros do VNA
@@ -120,36 +111,13 @@ class Config(NamedTuple):
         1001 pontos → sweep relativamente denso
     """
 
-    # -------------------------
-    # Parâmetros geométricos
-    # -------------------------
-
-    BEAM_WIDTH: int
-    """
-    Largura de feixe da antena (graus).
-
-    Uso no sistema:
-        - Define o passo angular:
-            step = BEAM_WIDTH / 10
-
-    Interpretação:
-        - Amostragem angular com ~10 pontos por feixe
-
-    Impacto:
-        - Valor menor → maior resolução angular (mais medições)
-        - Valor maior → menor tempo total de aquisição
-
-    Restrição:
-        - Deve ser > 0 (validado em tempo de execução)
-    """
-
 
 # Instância global de configuração
 CFG = Config(
     # Endereço do VNA via LAN (VISA)
     VNA_ADDRESS="TCPIP0::192.168.10.12::inst0::INSTR",
-    # Endereço do controlador de motores (a definir conforme hardware)
-    MTR_ADDRESS="",
+    RX_ENCODER_ADDRESS="TCPIP0::192.168.10.10::gpib1,8::INSTR",
+    RX_POWERSUPPLY_ADDRESS="TCPIP0::192.168.10.10::gpib1,6::INSTR",
     # Potência de saída (dBm)
     PWR=-10,
     # IF bandwidth (Hz)
@@ -157,9 +125,7 @@ CFG = Config(
     # Arquivo de calibração
     CAL="cal.cal",
     # Sweep de frequência
-    FSTART=1,  # Hz (atenção: valor muito baixo pode ser inválido para alguns VNAs)
-    FSTOP=18e9,  # 18 GHz
-    POINTS=1001,  # resolução espectral
-    # Parâmetro geométrico da antena
-    BEAM_WIDTH=10,  # graus
+    FSTART=2e9,  # Hz (atenção: valor muito baixo pode ser inválido para alguns VNAs)
+    FSTOP=10e9,  # 18 GHz
+    POINTS=101,  # resolução espectral
 )

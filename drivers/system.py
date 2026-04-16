@@ -1,3 +1,17 @@
+from __future__ import annotations
+
+from pathlib import Path
+from datetime import datetime
+from uuid import uuid4
+from time import time
+
+import numpy as np
+import pyvisa
+
+from vna import VNA
+from config import CFG
+from drivers.tx import rotate_tx
+
 class SYS:
     """
     Orquestrador do sistema de medição VNA + posicionamento angular.
@@ -31,7 +45,7 @@ class SYS:
 
         self.WATCHDOG_TIMEOUT = 5.0
 
-        self.cache_dir = Path("../.cache/sys")
+        self.cache_dir = Path(".cache/sys")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     # =========================
@@ -108,11 +122,8 @@ class SYS:
         """
         rm = pyvisa.ResourceManager()
 
-        encoder = rm.open_resource("TCPIP0::192.168.10.10::gpib1,8::INSTR")
-        encoder.clear()
-
-        pwr = rm.open_resource("TCPIP0::192.168.10.10::gpib1,6::INSTR")
-        pwr.clear()
+        encoder = rm.open_resource(CFG.RX_ENCODER_ADDRESS)
+        pwr = rm.open_resource(CFG.RX_POWERSUPPLY_ADDRESS)
 
         return encoder, pwr
 
@@ -223,58 +234,81 @@ class SYS:
         last_angle = None
         last_change_time = time()
 
-        measure = 0
-
-        while measure < 720:
+        while len(angle) < 720:
             angle = self._read_angle(encoder)
 
             if self._should_sample(angle, last_angle):
                 angles.append(angle)
-                print(angle)
-                measure += 1
 
                 last_angle = angle
                 last_change_time = self._update_watchdog(last_change_time)
 
-                #data = self._acquire_sparameters()
+                data = self._acquire_sparameters()
 
-                #if freq is None:
-                #    freq = data["freq"]
+                if freq is None:
+                    freq = data["freq"]
 
-                #s11_list.append(data["S11"])
-                #s21_list.append(data["S21"])
-                #s12_list.append(data["S12"])
-                #s22_list.append(data["S22"])
+                s11_list.append(data["S11"])
+                s21_list.append(data["S21"])
+                s12_list.append(data["S12"])
+                s22_list.append(data["S22"])
 
             self._check_watchdog(last_change_time)
-        return
-        #return {
-        #    "angle": angles,
-        #    "freq": freq,
-        #    "S11": s11_list,
-        #    "S21": s21_list,
-        #    "S12": s12_list,
-        #    "S22": s22_list,
-        #}
-
-    def _finalize_data(self, raw: dict) -> dict[str, np.ndarray]:
-        """
-        Converte listas acumuladas em arrays NumPy.
-
-        Garante:
-        - Estrutura consistente para persistência
-
-        Retorno:
-        - dict com arrays
-        """
+        
         return {
-            "angle": np.asarray(raw["angle"]),
-            "freq": np.asarray(raw["freq"]),
-            "S11": np.asarray(raw["S11"]),
-            "S21": np.asarray(raw["S21"]),
-            "S12": np.asarray(raw["S12"]),
-            "S22": np.asarray(raw["S22"]),
+            "angle": angles,
+            "freq": freq,
+            "S11": s11_list,
+            "S21": s21_list,
+            "S12": s12_list,
+            "S22": s22_list,
         }
+
+def _finalize_data(self, raw: dict) -> dict[str, np.ndarray]:
+    """
+    Consolida e valida os dados adquiridos.
+
+    Etapas:
+    - Conversão para arrays NumPy
+    - Validação dimensional
+    - Verificação de limite de amostras
+    - Ordenação por ângulo
+
+    Garantias:
+    - Consistência entre vetores
+    - Ordenação crescente de ângulo
+    - Limite máximo de 720 pontos
+
+    Retorno:
+    - dict com arrays ordenados
+    """
+    angle = np.asarray(raw["angle"])
+    freq = np.asarray(raw["freq"])
+
+    S11 = np.asarray(raw["S11"])
+    S21 = np.asarray(raw["S21"])
+    S12 = np.asarray(raw["S12"])
+    S22 = np.asarray(raw["S22"])
+
+    # -------------------------
+    # Ordenação por ângulo
+    # -------------------------
+    idx = np.argsort(angle)
+
+    angle_sorted = angle[idx]
+    S11_sorted = S11[idx]
+    S21_sorted = S21[idx]
+    S12_sorted = S12[idx]
+    S22_sorted = S22[idx]
+
+    return {
+        "angle": angle_sorted,
+        "freq": freq,
+        "S11": S11_sorted,
+        "S21": S21_sorted,
+        "S12": S12_sorted,
+        "S22": S22_sorted,
+    }
 
     def _measure_full_rotation(self, tx_pol: str) -> dict[str, np.ndarray]:
         """
@@ -412,8 +446,8 @@ class SYS:
         else:
             raise ValueError("Frações inválidas do encoder.")
     
-    out = integer_part + frac
-    if (int(out) == 360):
-        out = 0.0
+        out = integer_part + frac
+        if (int(out) == 360):
+            out = 0.0
 
-    return out
+        return out

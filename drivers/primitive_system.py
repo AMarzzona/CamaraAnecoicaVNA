@@ -8,9 +8,9 @@ from time import time
 import numpy as np
 import pyvisa
 
-from vna import VNA
-from ..config import CFG
-from tx import rotate_tx
+from drivers.vna import VNA
+from config import CFG
+from drivers.tx import rotate_tx
 
 class SYS:
     """
@@ -179,11 +179,11 @@ class SYS:
         rm = pyvisa.ResourceManager()
 
         # Enconder
-        encoder = rm.open_resource("TCPIP0::192.168.10.10::gpib1,8::INSTR")
+        encoder = rm.open_resource(CFG.RX_ENCODER_ADDRESS)
         encoder.clear()
 
         # Power supply
-        pwr = rm.open_resource("TCPIP0::192.168.10.10::gpib1,6::INSTR")
+        pwr = rm.open_resource(CFG.RX_POWERSUPPLY_ADDRESS)
         pwr.clear()
         try:
             pwr.write("VOLT 30")
@@ -347,8 +347,8 @@ class SYS:
             else:
                  raise ValueError("Parte fracionária da leitura do encoder fora do intervalo permtido.")
 
-    out = integer_part + parse_fractional_part(fractional_part)
-    if (int(out) == 360):
-        out = 0.0
+        out = integer_part + parse_fractional_part(fractional_part)
+        if (int(out) == 360):
+            out = 0.0
 
-    return out
+        return out
