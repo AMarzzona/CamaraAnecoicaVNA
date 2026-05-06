@@ -13,42 +13,34 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    // =========================
-    // CONFIGURACAO
-    // =========================
     u8 boardID = 3;
-    u8 axis = 1;
+    u8 axis    = 1;
 
     f64 acceleration = 4000;
     f64 deceleration = 4000;
-    f64 velocity = 500;
+    f64 velocity     = 500;
 
-    i32 targetPosition = atoi(argv[1]);
-    const char *outputPath = argv[2];
+    i32         targetPosition = atoi(argv[1]);
+    const char *outputPath     = argv[2];
 
     u16 axisStatus;
     u16 csr = 0;
     i32 position;
-
     u16 commandID;
     u16 resourceID;
     i32 errorCode;
 
-    // =========================
-    // CHECK RESET
-    // =========================
+    // Verifica se a placa saiu do estado de reset (deve ser inicializada via MAX)
     err = flex_read_csr_rtn(boardID, &csr);
     CheckError;
 
     if (csr & NIMC_POWER_UP_RESET)
     {
-        printf("Board em reset. Inicialize via MAX.\n");
+        printf("Placa em reset. Inicialize via MAX.\n");
         return -1;
     }
 
-    // =========================
-    // CONFIGURACAO DO MOVE
-    // =========================
+    // Configura e inicia movimento absoluto
     err = flex_load_acceleration(boardID, axis, NIMC_ACCELERATION, acceleration, 0xFF);
     CheckError;
 
@@ -67,9 +59,7 @@ int main(int argc, char *argv[])
     err = flex_start(boardID, axis, 0);
     CheckError;
 
-    // =========================
-    // LOOP DE EXECUCAO
-    // =========================
+    // Aguarda movimento completar
     do
     {
         err = flex_read_pos_rtn(boardID, axis, &position);
@@ -90,11 +80,9 @@ int main(int argc, char *argv[])
 
     } while (!(axisStatus & (NIMC_MOVE_COMPLETE_BIT | NIMC_AXIS_OFF_BIT)));
 
-    printf("Posicao final: %d\n", position);
+    printf("Posição final: %d\n", position);
 
-    // =========================
-    // SALVAR EM ARQUIVO
-    // =========================
+    // Persiste posição final para verificação de convergência pelo driver Python
     FILE *f = fopen(outputPath, "w");
     if (f != NULL)
     {
@@ -108,10 +96,8 @@ int main(int argc, char *argv[])
 
     return 0;
 
-    // =========================
-    // ERROR HANDLING
-    // =========================
-    nimcHandleError;
+// Tratamento de erros NI FlexMotion
+nimcHandleError;
 
     if (csr & NIMC_MODAL_ERROR_MSG)
     {
