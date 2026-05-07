@@ -151,12 +151,3 @@ Isso gera `tx.exe` no mesmo diretório. Parâmetros fixos no código: board ID 3
 ## Calibração do VNA
 
 A calibração compensa as perdas de cabos e conectores. Deve ser realizada no próprio instrumento antes de cada sessão e salva com o nome definido em `CFG.CAL`. O carregamento automático está disponível em `vna._load_calibration()`, mas está desabilitado por padrão — ative chamando esse método em `vna.setup()` se o VNA não retiver a calibração entre sessões.
-
----
-
-## Limitações conhecidas
-
-- **Sem detecção de erro de posicionamento da Rx**: se o motor não atingir a posição esperada, o sistema continua medindo sem aviso.
-- **Sweep assumido linear**: o vetor `freq` é gerado com `np.linspace`. Se o VNA estiver em modo logarítmico, os valores de frequência estarão incorretos.
-- **Driver Tx exclusivo para Windows**: em outros sistemas operacionais, `rotate_tx()` falhará ao tentar executar `tx.exe`.
-- **Execução sequencial**: as duas polarizações são medidas uma após a outra; não há paralelismo.
