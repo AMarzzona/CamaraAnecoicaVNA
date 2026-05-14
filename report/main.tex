@@ -1,0 +1,571 @@
+% ============================================================
+%  main.tex — Relatório Final de Estágio (ITA)
+%  Tipografia extraída de Relatorio_Final.doc
+%  Dados preenchidos a partir de Ficha_de_Proposta_de_Estagio.pdf
+% ============================================================
+
+\documentclass[12pt, a4paper]{article}
+
+% ── Codificação e idioma ────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+
+% ── Geometria da página ─────────────────────────────────────
+\usepackage[
+  a4paper,
+  top    = 2cm,
+  bottom = 2cm,
+  left   = 2.5cm,
+  right  = 2.5cm
+]{geometry}
+
+% ── Fontes principais ───────────────────────────────────────
+%
+%  Mapeamento .doc → LaTeX:
+%    Times New Roman   → tgtermes  (TeX Gyre Termes, clone de Times)
+%    Bookman Old Style → tgbonum   (TeX Gyre Bonum, clone de Bookman)
+%    Arial / Tahoma    → helvet    (Helvetica/Arial, via phv)
+%
+\usepackage{tgtermes}
+\usepackage{tgbonum}
+\usepackage[scaled=0.92]{helvet}
+\renewcommand{\familydefault}{\rmdefault}
+
+% ── Tamanho de fonte base: 10 pt (Normal style no .doc = 10 pt) ──
+\usepackage{scrextend}
+\changefontsizes[12pt]{10pt}
+
+% ── Espaçamento entre linhas ────────────────────────────────
+%  BodyText: line=276 (276/240 ≈ 1,15×); Heading1: line=360 (1,5×)
+\usepackage{setspace}
+\setstretch{1.15}
+
+% ── Parágrafos ──────────────────────────────────────────────
+\usepackage{indentfirst}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{3pt}
+
+% ── Formatação de capítulos e seções ────────────────────────
+%
+%  O template usa \section como nível principal ("capítulo").
+%  Títulos aumentados para 18 pt (original: 8 pt Heading 1).
+%  \clearpage automático embutido no \titleformat de \section.
+%
+\usepackage{titlesec}
+
+%  Nível principal — Bookman Old Style, 18 pt, negrito, centralizado.
+%  \clearpage antes de cada \section via hook no format.
+\titleformat{\section}
+  [block]
+  {\clearpage\fontfamily{qbk}\selectfont\bfseries\fontsize{18pt}{27pt}\selectfont\centering}
+  {\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{0pt}{12pt}
+
+%  Nível secundário — Arial, 14 pt, negrito.
+\titleformat{\subsection}
+  {\sffamily\bfseries\fontsize{14pt}{17pt}\selectfont}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{17pt}{4pt}
+
+%  Nível terciário — Arial, 12 pt, negrito.
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\fontsize{12pt}{15pt}\selectfont}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{3pt}
+
+% ── Numeração romana para seções (I., II., ...) ─────────────
+\renewcommand{\thesection}{\Roman{section}.}
+\renewcommand{\thesubsection}{\Roman{section}.\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{\Roman{section}.\arabic{subsection}.\arabic{subsubsection}.}
+
+% ── Comandos de conveniência para as fontes extras ──────────
+\newcommand{\textbookman}[1]{{\fontfamily{qbk}\selectfont #1}}
+\newcommand{\texttahoma}[1]{{\sffamily #1}}
+
+% ── Listagens de código ─────────────────────────────────────
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle   = \ttfamily\small,
+  keywordstyle = \bfseries,
+  commentstyle = \itshape\color{gray!70!black},
+  stringstyle  = \color{black},
+  showstringspaces = false,
+  breaklines   = true,
+  frame        = single,
+  framerule    = 0.4pt,
+  numbers      = left,
+  numberstyle  = \tiny\color{gray},
+  numbersep    = 6pt,
+  tabsize      = 4,
+  captionpos   = b,
+  xleftmargin  = 1.5em,
+  literate     =
+    {á}{{\'{a}}}1  {à}{{\`{a}}}1  {ã}{{\~{a}}}1  {â}{{\^{a}}}1
+    {é}{{\'{e}}}1  {ê}{{\^{e}}}1  {í}{{\'{i}}}1
+    {ó}{{\'{o}}}1  {õ}{{\~{o}}}1  {ô}{{\^{o}}}1
+    {ú}{{\'{u}}}1  {ç}{{\c{c}}}1
+    {Á}{{\'{A}}}1  {À}{{\`{A}}}1  {Ã}{{\~{A}}}1  {Â}{{\^{A}}}1
+    {É}{{\'{E}}}1  {Ê}{{\^{E}}}1  {Í}{{\'{I}}}1
+    {Ó}{{\'{O}}}1  {Õ}{{\~{O}}}1  {Ô}{{\^{O}}}1
+    {Ú}{{\'{U}}}1  {Ç}{{\c{C}}}1
+    {°}{{$^\circ$}}1,
+}
+
+\lstdefinestyle{python}{language=Python}
+\lstdefinestyle{clang} {language=C}
+
+% ── Bibliografia ────────────────────────────────────────────
+\usepackage[round, authoryear]{natbib}
+
+% ── Pacotes de apoio ────────────────────────────────────────
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{ragged2e}
+
+% ============================================================
+%  INÍCIO DO DOCUMENTO
+% ============================================================
+\begin{document}
+
+% ── CAPA ────────────────────────────────────────────────────
+\begin{center}
+  {\large INSTITUTO TECNOLÓGICO DE AERONÁUTICA}\\[4pt]
+  {\small CURSO DE ENGENHARIA ELETRÔNICA}\\[18pt]
+
+  {\fontsize{20pt}{24pt}\selectfont\bfseries RELATÓRIO DE ESTÁGIO}\\[18pt]
+
+  {\textbookman{\fontsize{24pt}{28pt}\selectfont\bfseries
+    Instituto de Fomento e Coordenação Industrial -- IFI/DCTA}}\\[36pt]
+
+  {\small São José dos Campos, SP}\\[6pt]
+  {\small Nome do Aluno: Andryus Marzzona Fernandes Martins}
+\end{center}
+
+\clearpage
+
+% ── FOLHA DE APROVAÇÃO ──────────────────────────────────────
+\begin{center}
+  {\fontsize{14pt}{17pt}\selectfont\bfseries FOLHA DE APROVAÇÃO}
+\end{center}
+
+\vspace{6pt}
+{\fontsize{12pt}{15pt}\selectfont
+Relatório Final de Estágio Curricular aceito em (data) pelos abaixo assinados:}
+
+\vspace{50pt}
+\begin{center}
+\rule{10cm}{0.4pt}\\[3pt]
+{\fontsize{12pt}{15pt}\selectfont Andryus Marzzona Fernandes Martins}\\[50pt]
+\rule{10cm}{0.4pt}\\[3pt]
+{\fontsize{12pt}{15pt}\selectfont Ten.\ Cássio Vinícius do Nascimento Santos -- Orientador/Supervisor na Empresa}\\[50pt]
+\rule{10cm}{0.4pt}\\[3pt]
+{\fontsize{12pt}{15pt}\selectfont Daniel Basso Ferreira -- Orientador/Supervisor no ITA}\\[50pt]
+\rule{10cm}{0.4pt}\\[3pt]
+{\fontsize{12pt}{15pt}\selectfont Marcelo da Silva Pinho -- Coordenador do Curso de Engenharia Eletrônica}
+\end{center}
+
+\clearpage
+
+% ── INFORMAÇÕES GERAIS ──────────────────────────────────────
+\begin{flushright}
+  {\texttahoma{\fontsize{14pt}{17pt}\selectfont\bfseries INFORMAÇÕES GERAIS}}
+\end{flushright}
+
+\vspace{6pt}
+{\texttahoma{\fontsize{11pt}{14pt}\selectfont
+\textbf{Estagiário}\\[4pt]
+Nome do Aluno: Andryus Marzzona Fernandes Martins\\[4pt]
+Curso: Engenharia Eletrônica\\[4pt]
+Turma: ELE 2026\\[12pt]
+\textbf{Empresa/Departamento}\\[4pt]
+Instituto de Fomento e Coordenação Industrial -- IFI/DCTA\\[4pt]
+\textbf{Endereço da Empresa:} Praça Mal.\ Eduardo Gomes, 50, Vila das Acácias\\[4pt]
+Cidade: São José dos Campos \quad Estado: SP \quad CEP: 12.231-970\\[4pt]
+\textbf{CNPJ:} 00.394.429/0142-41\\[12pt]
+\textbf{Orientador/Supervisor da Empresa}\\[4pt]
+Ten.\ Cássio Vinícius do Nascimento Santos\\
+Cargo: Chefe da Subdivisão de Laboratórios de Ensaios\\
+Tel: 12~98169-8226 \quad e-mail: \href{mailto:cassiocvns@fab.mil.br}{cassiocvns@fab.mil.br}\\[12pt]
+\textbf{Orientador/Supervisor do ITA}\\[4pt]
+Daniel Basso Ferreira\\
+Ramal: 6873 \quad e-mail: \href{mailto:danielbf@ita.br}{danielbf@ita.br}\\[12pt]
+\textbf{Período}\\[4pt]
+02/03/2025 a 24/04/2025\\[4pt]
+Total de horas: 172 horas
+}}
+
+% ── CONTEÚDO DO RELATÓRIO ───────────────────────────────────
+%
+%  Cada \section dispara \clearpage automaticamente (definido no
+%  \titleformat acima), de modo que não são necessários \clearpage
+%  manuais entre os capítulos.
+
+\section{INTRODUÇÃO}
+
+O presente relatório descreve as atividades desenvolvidas durante o estágio curricular realizado no Laboratório de Medições Eletromagnéticas (DCTA/IFI/CMA-LE), pertencente ao Instituto de Fomento e Coordenação Industrial (IFI/DCTA). O laboratório dispõe de uma câmara anecoica utilizada tanto na realização de ensaios de compatibilidade eletromagnética (EMC) segundo a norma militar MIL-STD-461 \citep{milstd461}, quanto na caracterização de antenas em campo distante \citep{oliveira2020}.
+
+Antes do estágio, as medições de caracterização de antenas no laboratório eram conduzidas com medidor de potência, instrumento que fornece apenas a amplitude do sinal recebido. Para determinar a razão axial de uma antena de polarização circular ou elíptica, era necessário empregar o método da antena linear girante \citep{ieee149_2021}: faz-se girar mecanicamente a antena transmissora, de polarização linear, enquanto se registra a amplitude da potência recebida em função do ângulo de rotação; a razão entre o valor máximo e o valor mínimo da envoltória fornece a razão axial naquela frequência. Esse método, embora correto, exige sessões de medição dedicadas, não fornece informação de fase e, por basear-se exclusivamente em amplitude, não permite determinar o sentido da polarização elíptica --- se à direita ou à esquerda \citep{ieee149_2021}.
+
+A principal atividade de desenvolvimento realizada ao longo do estágio foi a implementação de um sistema de software para automatizar medições de parâmetros S em câmara anecoica com um analisador de redes vetoriais (VNA --- \textit{Vector Network Analyzer}). Ao contrário do medidor de potência, o VNA mede amplitude e fase do sinal transmitido entre as antenas, fornecendo os parâmetros S completos em representação complexa \citep{ieee149_2021}. Com duas varreduras angulares completas da antena receptora --- uma para cada polarização linear ortogonal da transmissora --- todas as grandezas necessárias à caracterização da antena sob teste ficam disponíveis em uma única sessão de medição, sem necessidade de procedimentos adicionais: o diagrama de irradiação, a polarização e a razão axial em função da frequência.
+
+Paralelamente ao desenvolvimento do sistema, acompanhou-se a equipe do laboratório na condução de ensaios de compatibilidade eletromagnética, entre os quais os ensaios de susceptibilidade conduzida CS114 e CS116 e os ensaios de emissão irradiada e susceptibilidade irradiada RE102 e RS103, todos realizados segundo os requisitos da norma MIL-STD-461 \citep{milstd461}.
+
+\section{A EMPRESA}
+
+\subsection{Histórico}
+
+A origem do IFI remonta ao esforço de estruturação do setor aeronáutico brasileiro no pós-guerra \citep{ifi_historico}. Em 29 de janeiro de 1946, o Ministro da Aeronáutica, Major Brigadeiro-do-Ar Armando F.\ Trompowsky de Almeida, criou, pela Portaria nº~36, a Comissão de Organização do Centro Técnico de Aeronáutica (COCTA). Composta por três engenheiros militares e assessorada pelo Professor Richard H.\ Smith, do Massachusetts Institute of Technology (MIT), a comissão tinha a missão de receber os terrenos doados pelo Estado de São Paulo, em São José dos Campos, e planejar a instalação do futuro Centro Técnico de Aeronáutica (CTA).
+
+A visão de Smith para o CTA fundamentava-se num trinômio indissociável --- ensino, pesquisa e produção --- que orientaria a criação progressiva de seus institutos. O segmento ensino foi atendido com a fundação do Instituto Tecnológico de Aeronáutica (ITA), pela Lei 2.165, de 5 de janeiro de 1954. O segmento pesquisa veio a ser coberto pelo Instituto de Pesquisa e Desenvolvimento (IPD), criado em 23 de agosto de 1965. Faltava, ainda, um instituto voltado ao elo entre a pesquisa e o setor produtivo.
+
+Essa lacuna começou a ser preenchida com as reformas administrativas decorrentes do Decreto-Lei 200, de 25 de fevereiro de 1967. O Decreto 60.521, de 31 de maio daquele mesmo ano, reestruturou o Ministério da Aeronáutica e elevou o CTA a Comando Geral de Pesquisa e Desenvolvimento, criando simultaneamente o Instituto de Fomento e Coordenação Industrial para integrar o elo produtivo ao conjunto. O instituto nasceu, porém, de forma embrionária: sem sede própria, funcionou informalmente nas dependências do IPD enquanto aguardava sua ativação formal. O Decreto 64.200, de 14 de maio de 1969, institucionalizou essa fase transitória ao criar o Núcleo do Instituto de Fomento e Coordenação Industrial (NUIFI), diretamente subordinado ao Ministro da Aeronáutica.
+
+A consolidação definitiva ocorreu em 1971. O Decreto 68.874, de 5 de julho, transformou o CTA em Centro Técnico Aeroespacial e confirmou o IFI como um de seus institutos constitutivos. Quinze dias depois, em 20 de agosto de 1971, o Ministro da Aeronáutica assinou a Portaria nº~065/GM2, ativando formalmente o NUIFI e determinando que, no prazo de noventa dias, fosse apresentado o anteprojeto de regulamento do instituto. Essa data marca, desde então, o aniversário institucional do IFI.
+
+\subsection{Área onde foi desenvolvido o programa de estágio}
+
+O estágio foi realizado no Laboratório de Medições Eletromagnéticas
+(DCTA/IFI/CMA-LE), pertencente ao Instituto de Fomento e Coordenação
+Industrial (IFI/DCTA), localizado na Praça Mal.\ Eduardo Gomes, 50,
+Vila das Acácias, São José dos Campos -- SP.
+
+\subsection{O Estágio no Contexto da Empresa}
+
+O Laboratório de Medições Eletromagnéticas (DCTA/IFI/CMA-LE) conduz duas linhas principais de atividade. A primeira é a realização de ensaios de compatibilidade eletromagnética (EMC) segundo a norma MIL-STD-461 \citep{milstd461}, que estabelece os requisitos de interferência eletromagnética para equipamentos e subsistemas utilizados por plataformas militares. A segunda é a caracterização de antenas em câmara anecoica \citep{oliveira2020}, cujos resultados permitem extrair grandezas como diagrama de irradiação e polarização.
+
+O sistema desenvolvido durante o estágio insere-se na segunda linha de atividade e representa uma mudança qualitativa no processo de medição: a substituição do medidor de potência --- que fornece apenas amplitude --- por um VNA, capaz de medir amplitude e fase simultaneamente. Essa transição elimina a necessidade do método da antena linear girante \citep{ieee149_2021} para a determinação da razão axial, permite identificar o sentido da polarização elíptica --- se à direita ou à esquerda, informação inacessível por medições exclusivamente de amplitude --- e concentra, em uma única sessão de medição com duas polarizações ortogonais, toda a informação necessária para a caracterização completa da antena sob teste. Ao longo do período de estágio, acompanhou-se também a equipe do laboratório na execução de ensaios de EMC, entre os quais os ensaios de susceptibilidade conduzida CS114 e CS116 e os ensaios de emissão irradiada (RE102) e susceptibilidade irradiada (RS103).
+
+\section{SISTEMA DE MEDIÇÃO AUTOMATIZADO}
+
+Neste capítulo, será descrito o sistema de medição de parâmetros S desenvolvido durante o estágio. O sistema controla um \textit{Vector Network Analyzer} (VNA) e dois motores de posicionamento angular de antenas --- transmissora (Tx) e receptora (Rx) --- executando uma varredura de 0° a 360° para duas polarizações ortogonais da Tx. Em cada posição angular amostrada, os quatro parâmetros S (S11, S21, S12, S22) são adquiridos do VNA e armazenados. O sistema foi inteiramente implementado em Python \citep{pyvisa, numpy2020}, com exceção do driver de baixo nível do motor Tx, que é um executável em C por depender da biblioteca proprietária NI FlexMotion. Na sequência, serão apresentados a arquitetura geral do sistema e cada um dos seus módulos, com os respectivos trechos de código.
+
+\subsection{Arquitetura Geral}
+
+O sistema é organizado em quatro módulos, cada um com responsabilidade bem delimitada. O ponto de entrada é \texttt{main.py}, que instancia o orquestrador e dispara o ciclo de medição. O orquestrador, implementado na classe \texttt{SYS} em \texttt{drivers/system.py}, coordena os demais componentes: o driver do VNA (\texttt{drivers/vna.py}), o driver do motor Tx (\texttt{drivers/tx.py}) e a instância de configuração (\texttt{config.py}). O motor Rx e seu encoder são controlados diretamente pelo orquestrador via VISA. A Tabela~\ref{tab:hw} resume os canais de comunicação com cada instrumento.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Instrumento}     & \textbf{Protocolo}              & \textbf{Endereço}              \\
+\midrule
+VNA                      & VISA / SCPI sobre TCP/IP        & \texttt{CFG.VNA\_ADDRESS}      \\
+Encoder da Rx            & VISA / GPIB sobre LAN           & \texttt{CFG.RX\_ENCODER\_ADDRESS} \\
+Fonte de alimentação da Rx & VISA / GPIB sobre LAN         & \texttt{CFG.RX\_POWERSUPPLY\_ADDRESS} \\
+Motor Tx                 & \textit{subprocess} → \texttt{tx.exe} (NI FlexMotion) & --- \\
+\bottomrule
+\end{tabular}
+\caption{Instrumentos controlados pelo sistema e seus respectivos canais de comunicação.}
+\label{tab:hw}
+\end{table}
+
+Para executar o sistema, basta garantir que as dependências estejam instaladas e invocar o ponto de entrada:
+
+\begin{lstlisting}[style=python, caption={Ponto de entrada do sistema (\texttt{main.py}).}]
+from drivers.system import SYS
+
+inst = SYS()
+[filename_V, filename_H] = inst.measurement()
+\end{lstlisting}
+
+A chamada a \texttt{inst.measurement()} executa o ciclo completo e retorna os caminhos dos dois arquivos \texttt{.npz} gerados, um por polarização.
+
+\subsection{Configuração Centralizada}
+
+Todos os parâmetros do sistema --- endereços VISA, potência de saída do VNA, \textit{IF bandwidth}, arquivo de calibração e limites do \textit{sweep} de frequência --- estão reunidos em um único lugar: a instância global \texttt{CFG}, definida em \texttt{config.py}. A escolha de implementar essa estrutura como uma \texttt{NamedTuple} do Python é deliberada: tuplas nomeadas são imutáveis, de modo que nenhum módulo pode alterar \texttt{CFG} acidentalmente em tempo de execução. Para adaptar o sistema a um novo experimento ou a um hardware diferente, basta editar os valores no bloco de instanciação ao final do arquivo.
+
+\begin{lstlisting}[style=python, caption={Definição da estrutura de configuração (\texttt{config.py}).}]
+from typing import NamedTuple
+
+class Config(NamedTuple):
+    """Parâmetros centralizados do sistema de medição (imutável)."""
+
+    # Endereços VISA
+    VNA_ADDRESS: str
+    RX_ENCODER_ADDRESS: str
+    RX_POWERSUPPLY_ADDRESS: str
+
+    # Parâmetros do VNA
+    PWR: int    # Potência de saída (dBm)
+    IF: int     # IF bandwidth (Hz) — menor valor = menos ruído, sweep mais lento
+    CAL: str    # Nome do arquivo de calibração no VNA
+
+    # Sweep de frequência
+    FSTART: float   # Hz
+    FSTOP: float    # Hz
+    POINTS: int
+
+CFG = Config(
+    VNA_ADDRESS="TCPIP0::192.168.10.12::inst0::INSTR",
+    RX_ENCODER_ADDRESS="TCPIP0::192.168.10.10::gpib1,8::INSTR",
+    RX_POWERSUPPLY_ADDRESS="TCPIP0::192.168.10.10::gpib1,6::INSTR",
+    PWR=-10,
+    IF=1000,
+    CAL="cal.cal",
+    FSTART=2e9,
+    FSTOP=10e9,
+    POINTS=101,
+)
+\end{lstlisting}
+
+Note que o parâmetro \texttt{IF} controla diretamente o compromisso entre velocidade e ruído: valores menores produzem medições mais precisas, porém tornam cada \textit{sweep} significativamente mais lento, o que é crítico considerando que o sistema realiza centenas de sweeps por varredura angular.
+
+\subsection{Driver do VNA}
+
+A comunicação com o VNA é encapsulada na classe \texttt{VNA}, em \texttt{drivers/vna.py}. A interface pública oferece três métodos: \texttt{setup}, que configura potência, \textit{IF bandwidth} e define os quatro \textit{traces} S; \texttt{configure\_sweep}, que define a faixa de frequência e o número de pontos; e \texttt{measure\_all\_s}, que dispara um \textit{sweep} e retorna os parâmetros S em formato complexo. Os métodos restantes são internos.
+
+A inicialização da classe estabelece a sessão VISA e configura o modo de transferência de dados:
+
+\begin{lstlisting}[style=python, caption={Inicialização da sessão VISA e configuração do modo de transferência (\texttt{drivers/vna.py}).}]
+def __init__(self, resource: str):
+    rm = pyvisa.ResourceManager()
+    self.vna = rm.open_resource(resource)
+
+    # Sweeps com IF baixo ou muitos pontos podem levar vários segundos.
+    self.vna.timeout = 20000  # ms
+
+    # REAL,64: transferência binária em double precision (float64).
+    # SWAP: little-endian, compatível com numpy em x86/x64.
+    self.vna.write("FORM:DATA REAL,64")
+    self.vna.write("FORM:BORD SWAP")
+
+    # Reset para estado padrão — apaga configurações residuais.
+    self.vna.write("SYST:PRES")
+\end{lstlisting}
+
+A escolha de transferência binária em \texttt{REAL,64} merece atenção. O VNA é capaz de transmitir os dados tanto em formato ASCII quanto binário; entretanto, a representação ASCII de um número de ponto flutuante ocupa tipicamente entre 10 e 20 caracteres, ao passo que a representação binária de um \texttt{double} ocupa exatamente 8 bytes. Para um \textit{sweep} com 101 pontos e quatro parâmetros S, cada um formado por pares (Re, Im), a diferença de volume de dados transmitidos é expressiva, e a leitura binária é, portanto, substancialmente mais rápida.
+
+O disparo de cada \textit{sweep} é realizado pelo método \texttt{\_trigger}, que desabilita o modo contínuo do instrumento antes de iniciar uma única varredura e aguarda sua conclusão por meio do comando \texttt{*OPC?}:
+
+\begin{lstlisting}[style=python, caption={Disparo de um único \textit{sweep} e leitura de um \textit{trace} S (\texttt{drivers/vna.py}).}]
+def _trigger(self) -> None:
+    """Dispara um único sweep e aguarda conclusão (bloqueante)."""
+    self.vna.write("INIT:CONT OFF")
+    self.vna.write("INIT:IMM")
+    self.vna.query("*OPC?")  # bloqueia até o sweep completar
+
+def _get_complex_trace(self, name: str) -> np.ndarray:
+    """Lê um trace S e reconstrói o vetor complexo a partir dos pares (Re, Im)."""
+    self.vna.write(f"CALC1:PAR:SEL '{name}'")
+    raw = self.vna.query_binary_values(
+        "CALC1:DATA? SDATA", datatype="d", container=np.array
+    )
+    return raw[0::2] + 1j * raw[1::2]
+
+def measure_all_s(self) -> dict:
+    """Dispara sweep e retorna S11, S21, S12, S22 e o vetor de frequência."""
+    self._trigger()
+    return {
+        "freq": self.freq,
+        "S11": self._get_complex_trace("S11"),
+        "S21": self._get_complex_trace("S21"),
+        "S12": self._get_complex_trace("S12"),
+        "S22": self._get_complex_trace("S22"),
+    }
+\end{lstlisting}
+
+O instrumento retorna os dados de cada \textit{trace} como um vetor de números reais intercalados no formato $[\mathrm{Re}_0,\, \mathrm{Im}_0,\, \mathrm{Re}_1,\, \mathrm{Im}_1,\, \ldots]$. A reconstrução do vetor complexo é feita pelo fatiamento \texttt{raw[0::2] + 1j * raw[1::2]}, que seleciona alternadamente as partes real e imaginária. O vetor de frequências \texttt{self.freq} é calculado localmente via \texttt{np.linspace} no momento em que o \textit{sweep} é configurado, pois o instrumento não altera os limites de frequência entre varreduras --- lê-lo do instrumento a cada medição seria desnecessário e lento.
+
+\subsection{Controle do Motor Tx}
+
+O motor da antena Tx é um motor de passo controlado por uma placa NI FlexMotion. Por depender de uma biblioteca proprietária da National Instruments disponível apenas em Windows, o controle de baixo nível foi implementado em C e compilado como \texttt{tx.exe}. O driver Python, em \texttt{drivers/tx.py}, invoca esse executável via \texttt{subprocess} e verifica a convergência lendo um arquivo de cache.
+
+A conversão entre graus e passos do motor é direta, dado que uma revolução completa corresponde a 6000 passos:
+
+\begin{lstlisting}[style=python, caption={Função principal de controle do motor Tx (\texttt{drivers/tx.py}).}]
+STEPS_PER_REV = 6000
+DEG_PER_REV   = 360
+MAX_ATTEMPTS  = 10
+RETRY_DELAY   = 0.2  # s
+
+def deg_to_steps(deg: float) -> int:
+    return int(round((STEPS_PER_REV / DEG_PER_REV) * deg))
+
+def rotate_tx(target_deg: float) -> None:
+    """Move a antena Tx para a posição alvo (graus), com
+    retentativas até MAX_ATTEMPTS."""
+    target_steps = deg_to_steps(target_deg)
+
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        current_steps = _read_position()  # lê arquivo de cache
+
+        if current_steps == target_steps:
+            print("[TX] Posição atingida.")
+            return
+
+        result = subprocess.run(
+            [EXECUTABLE, str(target_steps), CACHE_FILE],
+            cwd=CONTROL_DIR,
+        )
+        if result.returncode != 0:
+            raise RuntimeError("[TX] Erro ao executar tx.exe")
+
+        time.sleep(RETRY_DELAY)
+
+    raise RuntimeError(
+        f"[TX] Falha de convergência após {MAX_ATTEMPTS} tentativas."
+    )
+\end{lstlisting}
+
+O mecanismo de verificação de convergência merece ser explicado. O executável \texttt{tx.exe} recebe a posição alvo em passos e o caminho de um arquivo de texto; ao concluir o movimento, grava nesse arquivo a posição final efetivamente atingida pelo motor. Na chamada seguinte, \texttt{rotate\_tx} lê esse arquivo e compara o valor com o alvo antes de invocar o executável novamente, evitando movimentos redundantes. Essa abordagem de comunicação por arquivo é necessária porque o executável não mantém estado entre execuções --- cada chamada ao \texttt{subprocess} é um processo independente.
+
+O executável, por sua vez, configura o perfil cinemático do movimento e aguarda sua conclusão em \textit{polling} sobre os registradores de status da placa:
+
+\begin{lstlisting}[style=clang, caption={Laço de espera pelo fim do movimento em \texttt{tx.c}.}]
+/* Configura e inicia movimento absoluto */
+flex_load_acceleration(boardID, axis, NIMC_ACCELERATION, 4000, 0xFF);
+flex_load_acceleration(boardID, axis, NIMC_DECELERATION, 4000, 0xFF);
+flex_load_velocity(boardID, axis, 500, 0xFF);
+flex_set_op_mode(boardID, axis, NIMC_ABSOLUTE_POSITION);
+flex_load_target_pos(boardID, axis, targetPosition, 0xFF);
+flex_start(boardID, axis, 0);
+
+/* Aguarda conclusão do movimento */
+do {
+    flex_read_pos_rtn(boardID, axis, &position);
+    flex_read_axis_status_rtn(boardID, axis, &axisStatus);
+    flex_read_csr_rtn(boardID, &csr);
+
+    if (csr & NIMC_MODAL_ERROR_MSG) {
+        flex_stop_motion(boardID, NIMC_VECTOR_SPACE1, NIMC_DECEL_STOP, 0);
+        /* ... tratamento de erro ... */
+    }
+} while (!(axisStatus & (NIMC_MOVE_COMPLETE_BIT | NIMC_AXIS_OFF_BIT)));
+
+/* Grava posição final no arquivo de cache */
+FILE *f = fopen(outputPath, "w");
+fprintf(f, "%d", position);
+fclose(f);
+\end{lstlisting}
+
+O laço \texttt{do-while} termina quando o bit \texttt{NIMC\_MOVE\_COMPLETE\_BIT} ou o bit \texttt{NIMC\_AXIS\_OFF\_BIT} é ativado no registrador de status do eixo, indicando respectivamente que o movimento foi concluído normalmente ou que o eixo foi desabilitado por um erro. A placa utilizada é a de identificação (\textit{board ID}) 3, eixo 1, com aceleração e desaceleração de 4000 passos/s² e velocidade máxima de 500 passos/s.
+
+\subsection{Orquestração das Medições}
+
+A classe \texttt{SYS}, em \texttt{drivers/system.py}, é o orquestrador de todo o experimento. Ao ser instanciada, ela inicializa o VNA --- aplicando preset, configurando potência, \textit{IF bandwidth} e \textit{sweep} --- e cria o diretório de saída para os arquivos de dados. O método público \texttt{measurement()} executa então dois ciclos de varredura angular completos, um para cada polarização da Tx, e retorna os caminhos dos arquivos gerados.
+
+O núcleo do sistema é o método privado \texttt{\_measure\_full\_rotation}, que gerencia a varredura angular da Rx. Ao ser chamado, ele posiciona a antena Tx na polarização solicitada, liga a fonte de alimentação do motor da Rx e entra em um laço de \textit{polling} sobre o encoder angular:
+
+\begin{lstlisting}[style=python, caption={Laço principal de varredura angular (\texttt{drivers/system.py}).}]
+pwr.write("VOLT 30")
+pwr.write("CURR 1")
+pwr.write("OUTP ON")
+
+measure = 0
+curr_angle = None
+last_change_time = time()
+
+while measure < 720:
+    angle = self._discretize_angle(
+        self._parse_angle(encoder.query("MEAS?"))
+    )
+
+    # Registra medição apenas quando o ângulo muda pelo menos 0,5°.
+    # A comparação em décimos evita erros de ponto flutuante.
+    if curr_angle is None or int(10 * angle) != int(10 * curr_angle):
+        angles.append(angle)
+        measure += 1
+        curr_angle = angle
+        last_change_time = time()
+
+        data = self.vna.measure_all_s()
+        s11_list.append(np.asarray(data["S11"]))
+        s21_list.append(np.asarray(data["S21"]))
+        # ...
+
+    # Watchdog: aborta se o ângulo estagnar por mais de 5 s.
+    if time() - last_change_time > self.WATCHDOG_TIMEOUT:
+        raise RuntimeError(
+            "Watchdog: ângulo estagnado — possível travamento."
+        )
+\end{lstlisting}
+
+A condição de parada é \texttt{measure < 720}, valor escolhido para garantir cobertura angular completa mesmo com variações na velocidade de rotação do motor. A comparação \texttt{int(10 * angle) != int(10 * curr\_angle)} é necessária para tratar corretamente a resolução de 0,5°: comparar diretamente valores de ponto flutuante como \texttt{0.5}, \texttt{1.0}, \texttt{1.5} pode produzir falsas diferenças devido a erros de representação. Ao multiplicar por 10 e truncar para inteiro, compara-se efetivamente os décimos de grau, o que é exato.
+
+O \textit{watchdog}, implementado pela verificação de \texttt{time() - last\_change\_time}, é uma salvaguarda contra travamentos mecânicos ou falhas de comunicação com o encoder. Caso o ângulo não evolua por mais de 5 segundos, uma \texttt{RuntimeError} é lançada e o laço é interrompido. Independentemente de como o laço termina --- por conclusão normal, por \texttt{KeyboardInterrupt} ou por exceção ---, a fonte de alimentação do motor é sempre desligada no bloco \texttt{finally}, garantindo que o motor não permaneça energizado sem supervisão.
+
+\subsubsection{Protocolo do Encoder Angular}
+
+O encoder da antena Rx responde ao comando GPIB \texttt{MEAS?} com uma cadeia de caracteres no formato \texttt{Xdddmmm}, em que \texttt{X} é um caractere líder ignorado, \texttt{ddd} representa os graus inteiros (com zeros à esquerda) e \texttt{mmm} os milésimos de grau. A interpretação é feita pelo método \texttt{\_parse\_angle}:
+
+\begin{lstlisting}[style=python, caption={Interpretação da resposta bruta do encoder e discretização angular (\texttt{drivers/system.py}).}]
+def _parse_angle(self, raw: str) -> float:
+    """Converte resposta bruta do encoder para graus decimais.
+
+    Formato: Xdddmmm, onde ddd = graus inteiros e mmm/1000 = fração.
+    Exemplo: 'X045500' -> 45 + 500/1000 = 45,5°
+    """
+    digits = raw.strip()[1:]
+    return round(int(digits[:3]) + int(digits[3:]) / 1000, 1)
+
+def _discretize_angle(self, num: float) -> float:
+    """Arredonda para resolução de 0,5°.
+
+    Regra aplicada à parte fracionária (em décimos):
+        0-2 -> 0,0  (arredonda para baixo)
+        3-6 -> 0,5  (arredonda para metade)
+        7-9 -> 1,0  (arredonda para cima)
+    """
+    integer_part = int(num)
+    dec = int(10 * num) - 10 * integer_part
+
+    if dec <= 2:
+        frac = 0.0
+    elif dec <= 6:
+        frac = 0.5
+    else:
+        frac = 1.0
+
+    out = integer_part + frac
+    return 0.0 if int(out) == 360 else out
+\end{lstlisting}
+
+A discretização filtra o ruído natural do encoder, cujas leituras consecutivas na mesma posição física podem oscilar levemente. A normalização de 360° para 0° no final do método garante a consistência do intervalo angular adotado, $[0°, 360°)$.
+
+\subsection{Formato dos Dados Gerados}
+
+Ao término de cada varredura angular, os dados coletados são empilhados em \textit{arrays} NumPy e salvos em um arquivo \texttt{.npz} --- o formato binário nativo do NumPy, sem compressão adicional. O nome do arquivo segue o padrão \texttt{YYYYMMDD\_HHMMSS\_\textlangle ID\textrangle\_\textlangle POL\textrangle.npz}, em que \texttt{ID} é um identificador hexadecimal de 8 caracteres gerado por UUID4 e \texttt{POL} é \texttt{V} ou \texttt{H}. As duas medições de um mesmo experimento compartilham o mesmo \textit{timestamp} e \texttt{ID}, facilitando sua associação.
+
+Cada arquivo contém os seguintes \textit{arrays}:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Array} & \textbf{Shape} & \textbf{Descrição} \\
+\midrule
+\texttt{angle} & $(N_a,)$ & Ângulos amostrados (graus) \\
+\texttt{freq}  & $(N_f,)$ & Frequências do \textit{sweep} (Hz) \\
+\texttt{S11}, \texttt{S21}, \texttt{S12}, \texttt{S22} & $(N_a, N_f)$ & Parâmetros S (complexo) \\
+\bottomrule
+\end{tabular}
+\caption{Conteúdo dos arquivos \texttt{.npz} gerados pelo sistema.}
+\label{tab:npz}
+\end{table}
+
+Cada linha das matrizes de parâmetros S corresponde a um ângulo e cada coluna a uma frequência, de modo que \texttt{S21[i, j]} é o parâmetro $S_{21}$ medido no ângulo \texttt{angle[i]} e na frequência \texttt{freq[j]}. O carregamento dos dados em Python é imediato:
+
+\begin{lstlisting}[style=python, caption={Carregamento dos dados gerados.}]
+import numpy as np
+
+d = np.load("../.cache/sys/20250315_143022_A1B2C3D4_V.npz")
+angulos = d["angle"]   # shape (Na,)
+s21     = d["S21"]     # shape (Na, Nf), complexo
+\end{lstlisting}
+
+\section{COMENTÁRIOS E CONCLUSÕES}
+
+O sistema desenvolvido durante o estágio cobre o ciclo completo de aquisição de parâmetros S em câmara anecoica: inicialização e configuração do VNA, controle dos motores de posicionamento das antenas Tx e Rx, sincronização entre posição angular e disparo do instrumento, e persistência dos dados em disco. O resultado é um conjunto de arquivos que registram os quatro parâmetros S em função do ângulo e da frequência, para as polarizações vertical e horizontal, prontos para análise posterior.
+
+A etapa de processamento dos dados constitui um desenvolvimento natural a ser realizado futuramente. Por reunir amplitude e fase nas duas polarizações ortogonais, os dados adquiridos contêm toda a informação necessária para a caracterização completa da antena sob teste \citep{ieee149_2021}: o diagrama de irradiação, a razão axial e o sentido da polarização elíptica --- se à direita ou à esquerda --- são deriváveis diretamente dos parâmetros S complexos coletados, sem necessidade de sessões adicionais de medição. A disponibilidade da fase é, em particular, o que torna possível a identificação do sentido da polarização, grandeza inacessível ao método da antena linear girante, que opera exclusivamente com amplitude. Pretende-se implementar essas rotinas futuramente. O formato de armazenamento adotado foi pensado precisamente para facilitar esse processamento: cada arquivo \texttt{.npz} reúne, em arrays NumPy indexados por ângulo e frequência, tudo o que é necessário para derivar essas grandezas sem qualquer etapa adicional de aquisição.
+
+\bibliographystyle{plainnat}
+\bibliography{referencias}
+
+\end{document}
