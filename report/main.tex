@@ -7,8 +7,7 @@
 \documentclass[12pt, a4paper]{article}
 
 % ── Codificação e idioma ────────────────────────────────────
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
 \usepackage[brazil]{babel}
 
 % ── Geometria da página ─────────────────────────────────────
@@ -21,16 +20,12 @@
 ]{geometry}
 
 % ── Fontes principais ───────────────────────────────────────
-%
-%  Mapeamento .doc → LaTeX:
-%    Times New Roman   → tgtermes  (TeX Gyre Termes, clone de Times)
-%    Bookman Old Style → tgbonum   (TeX Gyre Bonum, clone de Bookman)
-%    Arial / Tahoma    → helvet    (Helvetica/Arial, via phv)
-%
-\usepackage{tgtermes}
-\usepackage{tgbonum}
-\usepackage[scaled=0.92]{helvet}
-\renewcommand{\familydefault}{\rmdefault}
+%  Corpo: Latin Modern Roman (sucessor OpenType do Computer Modern).
+%  Cabeçalhos: TeX Gyre Heros (clone OpenType do Helvetica, \sffamily).
+%  Mono: Latin Modern Mono (para listagens de código).
+\setmainfont{Latin Modern Roman}
+\setsansfont[Scale=0.92]{TeX Gyre Heros}
+\setmonofont{Latin Modern Mono}
 
 % ── Tamanho de fonte base: 10 pt (Normal style no .doc = 10 pt) ──
 \usepackage{scrextend}
@@ -54,11 +49,11 @@
 %
 \usepackage{titlesec}
 
-%  Nível principal — Bookman Old Style, 18 pt, negrito, centralizado.
+%  Nível principal — Helvetica, 18 pt, negrito, centralizado.
 %  \clearpage antes de cada \section via hook no format.
 \titleformat{\section}
   [block]
-  {\clearpage\fontfamily{qbk}\selectfont\bfseries\fontsize{18pt}{27pt}\selectfont\centering}
+  {\clearpage\sffamily\bfseries\fontsize{18pt}{27pt}\selectfont\centering}
   {\thesection}{1em}{}
 \titlespacing*{\section}{0pt}{0pt}{12pt}
 
@@ -80,7 +75,7 @@
 \renewcommand{\thesubsubsection}{\Roman{section}.\arabic{subsection}.\arabic{subsubsection}.}
 
 % ── Comandos de conveniência para as fontes extras ──────────
-\newcommand{\textbookman}[1]{{\fontfamily{qbk}\selectfont #1}}
+\newcommand{\textbookman}[1]{{\sffamily #1}}
 \newcommand{\texttahoma}[1]{{\sffamily #1}}
 
 % ── Listagens de código ─────────────────────────────────────
@@ -111,7 +106,9 @@
     {É}{{\'{E}}}1  {Ê}{{\^{E}}}1  {Í}{{\'{I}}}1
     {Ó}{{\'{O}}}1  {Õ}{{\~{O}}}1  {Ô}{{\^{O}}}1
     {Ú}{{\'{U}}}1  {Ç}{{\c{C}}}1
-    {°}{{$^\circ$}}1,
+    {°}{{$^\circ$}}1
+    {—}{{\textemdash}}1
+    {→}{{$\to$}}1,
 }
 
 \lstdefinestyle{python}{language=Python}
@@ -127,6 +124,7 @@
 \usepackage{array}
 \usepackage{microtype}
 \usepackage{ragged2e}
+\usepackage{pdfpages}
 
 % ============================================================
 %  INÍCIO DO DOCUMENTO
@@ -134,20 +132,32 @@
 \begin{document}
 
 % ── CAPA ────────────────────────────────────────────────────
-\begin{center}
-  {\large INSTITUTO TECNOLÓGICO DE AERONÁUTICA}\\[4pt]
-  {\small CURSO DE ENGENHARIA ELETRÔNICA}\\[18pt]
+\begin{titlepage}
+  \begin{center}
+    {\large INSTITUTO TECNOLÓGICO DE AERONÁUTICA}\\[4pt]
+    {\small CURSO DE ENGENHARIA ELETRÔNICA}\\[18pt]
 
-  {\fontsize{20pt}{24pt}\selectfont\bfseries RELATÓRIO DE ESTÁGIO}\\[18pt]
+    {\fontsize{20pt}{24pt}\selectfont\bfseries RELATÓRIO DE ESTÁGIO}\\[18pt]
 
-  {\textbookman{\fontsize{24pt}{28pt}\selectfont\bfseries
-    Instituto de Fomento e Coordenação Industrial -- IFI/DCTA}}\\[36pt]
+    {\textbookman{\fontsize{24pt}{28pt}\selectfont\bfseries
+      Instituto de Fomento e Coordenação Industrial -- IFI/DCTA}}
+  \end{center}
 
-  {\small São José dos Campos, SP}\\[6pt]
-  {\small Nome do Aluno: Andryus Marzzona Fernandes Martins}
-\end{center}
+  \vspace*{2cm}
+  \begin{center}
+    \includegraphics[width=6cm]{ifi.jpg}
+  \end{center}
 
-\clearpage
+  \vspace{3cm}
+
+
+  \vfill
+
+  \begin{center}
+    {\large Nome do Aluno: Andryus Marzzona Fernandes Martins}\\[6pt]
+    {\large São José dos Campos, SP}
+  \end{center}
+\end{titlepage}
 
 % ── FOLHA DE APROVAÇÃO ──────────────────────────────────────
 \begin{center}
@@ -156,7 +166,7 @@
 
 \vspace{6pt}
 {\fontsize{12pt}{15pt}\selectfont
-Relatório Final de Estágio Curricular aceito em (data) pelos abaixo assinados:}
+Relatório Final de Estágio Curricular aceito em 15/05/2026 pelos abaixo assinados:}
 
 \vspace{50pt}
 \begin{center}
@@ -173,13 +183,14 @@ Relatório Final de Estágio Curricular aceito em (data) pelos abaixo assinados:
 \clearpage
 
 % ── INFORMAÇÕES GERAIS ──────────────────────────────────────
-\begin{flushright}
-  {\texttahoma{\fontsize{14pt}{17pt}\selectfont\bfseries INFORMAÇÕES GERAIS}}
-\end{flushright}
+% \begin{flushright}
+%   {}
+% \end{flushright}
+\noindent\texttahoma{\fontsize{14pt}{17pt}\selectfont\bfseries INFORMAÇÕES GERAIS}
 
-\vspace{6pt}
+\vspace{10pt}
 {\texttahoma{\fontsize{11pt}{14pt}\selectfont
-\textbf{Estagiário}\\[4pt]
+\noindent\textbf{Estagiário}\\[4pt]
 Nome do Aluno: Andryus Marzzona Fernandes Martins\\[4pt]
 Curso: Engenharia Eletrônica\\[4pt]
 Turma: ELE 2026\\[12pt]
@@ -196,7 +207,7 @@ Tel: 12~98169-8226 \quad e-mail: \href{mailto:cassiocvns@fab.mil.br}{cassiocvns@
 Daniel Basso Ferreira\\
 Ramal: 6873 \quad e-mail: \href{mailto:danielbf@ita.br}{danielbf@ita.br}\\[12pt]
 \textbf{Período}\\[4pt]
-02/03/2025 a 24/04/2025\\[4pt]
+02/03/2026 a 24/04/2026\\[4pt]
 Total de horas: 172 horas
 }}
 
@@ -526,7 +537,7 @@ def _discretize_angle(self, num: float) -> float:
     return 0.0 if int(out) == 360 else out
 \end{lstlisting}
 
-A discretização filtra o ruído natural do encoder, cujas leituras consecutivas na mesma posição física podem oscilar levemente. A normalização de 360° para 0° no final do método garante a consistência do intervalo angular adotado, $[0°, 360°)$.
+A discretização filtra o ruído natural do encoder, cujas leituras consecutivas na mesma posição física podem oscilar levemente. A normalização de 360° para 0° no final do método garante a consistência do intervalo angular adotado, $[0°, 360°$.
 
 \subsection{Formato dos Dados Gerados}
 
@@ -567,5 +578,8 @@ A etapa de processamento dos dados constitui um desenvolvimento natural a ser re
 
 \bibliographystyle{plainnat}
 \bibliography{referencias}
+
+\includepdf[pages=-]{frequencia.pdf}
+\includepdf[pages=-]{avaliacao.pdf}
 
 \end{document}
