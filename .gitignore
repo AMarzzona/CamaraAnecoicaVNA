@@ -32,3 +32,7 @@ htmlcov/
 
 # Documentação do Claude Code
 CLAUDE.md
+
+# Relatório — ignorar tudo exceto o PDF compilado
+report/*
+!report/main.pdf
